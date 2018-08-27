@@ -485,7 +485,7 @@ else:
             full_names.append(full_name)
         return full_names
 
-    # Output 2
+    # Output pc
     print('=== Output ===')
     output = DataFrame(model_metrics_combined)
     output.columns = ['Accuracy', 'F1 score', 'Precision', 'Recall']
