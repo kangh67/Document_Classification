@@ -12,7 +12,7 @@ from keras.callbacks import Callback, ModelCheckpoint
 from keras.models import load_model
 from additional_metrics import *
 
-mode = 'compare'  # 'CNN', 'RNN', 'RNN_att', 'H_RNN', 'H_RNN_att', 'compare'
+mode = 'CNN'  # 'ini', 'CNN', 'RNN', 'RNN_att', 'H_RNN', 'H_RNN_att', 'compare'
 
 EMB_DIM = 300
 trainable = True
@@ -34,41 +34,46 @@ train_file = './data/MAUDE_train.tsv'
 dev_file = './data/MAUDE_dev.tsv'
 test_file = './data/MAUDE_test.tsv'
 
-"""
-# === Split the original data to train, dev, and test, run for the first time only ===
-# read file
-print("Reading raw data ...")
-data = pd.read_csv(tsv_file, sep='\t')
-data = np.asarray(data)
-print("Raw data shape: " + str(data.shape))
 
-# shuffle
-indices = np.arange(data.shape[0])
-np.random.shuffle(indices)
-data = data[indices]
-data_train = data[: int(0.7 * data.shape[0])]
-data_dev = data[int(0.7 * data.shape[0]): (int(0.7 * data.shape[0]) + int(0.1 * data.shape[0]))]
-data_test = data[(int(0.7 * data.shape[0]) + int(0.1 * data.shape[0])):]
+if mode == 'ini':
+    # === Create .tsv file from .xlsx file, , run for the first time only ===
+    xlsx_to_tsv()
+    # === Split the original data to train, dev, and test, run for the first time only ===
+    # read file
+    print("Reading raw data ...")
+    data = pd.read_csv(tsv_file, sep='\t')
+    data = np.asarray(data)
+    print("Raw data shape: " + str(data.shape))
 
-# generate train, dev, and test files
-with open(train_file, "w") as f:
-    f.write("ID\tHIT\tREPORT\n")
-    for one_line in data_train:
-        f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
-print('Training file written to:', train_file)
+    # shuffle
+    indices = np.arange(data.shape[0])
+    np.random.shuffle(indices)
+    data = data[indices]
+    data_train = data[: int(0.7 * data.shape[0])]
+    data_dev = data[int(0.7 * data.shape[0]): (int(0.7 * data.shape[0]) + int(0.1 * data.shape[0]))]
+    data_test = data[(int(0.7 * data.shape[0]) + int(0.1 * data.shape[0])):]
 
-with open(dev_file, "w") as f:
-    f.write("ID\tHIT\tREPORT\n")
-    for one_line in data_dev:
-        f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
-print('Dev file written to:', dev_file)
+    # generate train, dev, and test files
+    with open(train_file, "w") as f:
+        f.write("ID\tHIT\tREPORT\n")
+        for one_line in data_train:
+            f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
+    print('Training file written to:', train_file)
 
-with open(test_file, "w") as f:
-    f.write("ID\tHIT\tREPORT\n")
-    for one_line in data_test:
-        f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
-print('Test file written to:', test_file)
-"""
+    with open(dev_file, "w") as f:
+        f.write("ID\tHIT\tREPORT\n")
+        for one_line in data_dev:
+            f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
+    print('Dev file written to:', dev_file)
+
+    with open(test_file, "w") as f:
+        f.write("ID\tHIT\tREPORT\n")
+        for one_line in data_test:
+            f.write(str(one_line[0]) + "\t" + str(one_line[1]) + "\t" + str(one_line[2]) + "\n")
+    print('Test file written to:', test_file)
+
+    sys.exit(0)
+
 
 # === Prepare train, dev, and test data ===
 data_train = pd.read_csv(train_file, sep='\t')
@@ -189,11 +194,13 @@ if mode != 'compare':
 
 
 # Apply Callback to calculate f1, precision, and recall on dev set after each epoch
-class f1_precision_recall(Callback):
+class f1_precision_recall_seq(Callback):
     def on_train_begin(self, logs={}):
         self.val_f1s = []
         self.val_recalls = []
         self.val_precisions = []
+        self.test_f1s = []
+        self.test_accs = []
 
     def on_epoch_end(self, epoch, logs={}):
         # val
@@ -207,6 +214,48 @@ class f1_precision_recall(Callback):
         self.val_recalls.append(_val_recall)
         self.val_precisions.append(_val_precision)
         print('- val_f1: %0.4f - val_precision: %0.4f - val_recall: %0.4f' % (_val_f1, _val_precision, _val_recall))
+        # test
+        test_predict = (np.asarray(self.model.predict(
+            x_test_seq))).round()
+        test_targ = y_test
+        _test_f1 = f1_score(test_targ.T[1], test_predict.T[1])
+        _test_acc = accuracy_score(test_targ.T[1], test_predict.T[1])
+        self.test_f1s.append(_test_f1)
+        self.test_accs.append(_test_acc)
+        print('- test_acc: %0.4f - test_f1: %0.4f'
+              % (_test_acc, _test_f1))
+        return
+
+class f1_precision_recall_hie(Callback):
+    def on_train_begin(self, logs={}):
+        self.val_f1s = []
+        self.val_recalls = []
+        self.val_precisions = []
+        self.test_f1s = []
+        self.test_accs = []
+
+    def on_epoch_end(self, epoch, logs={}):
+        # val
+        val_predict = (np.asarray(self.model.predict(
+            self.validation_data[0]))).round()
+        val_targ = self.validation_data[1]
+        _val_f1 = f1_score(val_targ.T[1], val_predict.T[1])
+        _val_recall = recall_score(val_targ.T[1], val_predict.T[1])
+        _val_precision = precision_score(val_targ.T[1], val_predict.T[1])
+        self.val_f1s.append(_val_f1)
+        self.val_recalls.append(_val_recall)
+        self.val_precisions.append(_val_precision)
+        print('- val_f1: %0.4f - val_precision: %0.4f - val_recall: %0.4f' % (_val_f1, _val_precision, _val_recall))
+        # test
+        test_predict = (np.asarray(self.model.predict(
+            x_test_hie))).round()
+        test_targ = y_test
+        _test_f1 = f1_score(test_targ.T[1], test_predict.T[1])
+        _test_acc = accuracy_score(test_targ.T[1], test_predict.T[1])
+        self.test_f1s.append(_test_f1)
+        self.test_accs.append(_test_acc)
+        print('- test_acc: %0.4f - test_f1: %0.4f'
+              % (_test_acc, _test_f1))
         return
 
 
@@ -221,14 +270,20 @@ if mode != 'compare':
                   optimizer=opt,
                   metrics=['acc'])
 
-    recall_metrics = f1_precision_recall()
+    recall_metrics_seq = f1_precision_recall_seq()
+    recall_metrics_hie = f1_precision_recall_hie()
+
+    if mode == 'CNN' or mode == 'RNN' or mode == 'RNN_att':
+        recall_metrics = recall_metrics_seq
+    else:
+        recall_metrics = recall_metrics_hie
 
     # saves the model and weights after each epoch if the validation loss decreased
     checkpointer = ModelCheckpoint(filepath='./models/weights.{epoch:02d}-{val_loss:.2f}-{val_acc:.3f}.hdf5',
                                    monitor='val_acc',
                                    mode='max',
                                    verbose=1,
-                                   save_best_only=True,
+                                   save_best_only=False,
                                    save_weights_only=True)
     # Training
     print("=== Training ===")
