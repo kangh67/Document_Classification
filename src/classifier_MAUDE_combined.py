@@ -12,7 +12,7 @@ from keras.callbacks import Callback, ModelCheckpoint
 from keras.models import load_model
 from additional_metrics import *
 
-mode = 'CNN'  # 'ini', 'CNN', 'RNN', 'RNN_att', 'H_RNN', 'H_RNN_att', 'compare'
+mode = 'H_RNN_att'  # 'ini', 'CNN', 'RNN', 'RNN_att', 'H_RNN', 'H_RNN_att', 'compare'
 
 EMB_DIM = 300
 trainable = True
@@ -305,7 +305,8 @@ if mode != 'compare':
     del model
     # Write log
     customized_metrics = {'val_f1': recall_metrics.val_f1s, 'val_pre:': recall_metrics.val_precisions,
-                          'val_rec': recall_metrics.val_recalls}
+                          'val_rec': recall_metrics.val_recalls, 'test_acc': recall_metrics.test_accs,
+                          'test_f1': recall_metrics.test_f1s}
     history.history.update(customized_metrics)
     DataFrame(history.history).to_csv("logs/" + str(mode) + ".csv")
 
@@ -540,7 +541,7 @@ else:
             full_names.append(full_name)
         return full_names
 
-    # Output pc
+    # Output
     print('=== Output ===')
     output = DataFrame(model_metrics_combined)
     output.columns = ['Accuracy', 'F1 score', 'Precision', 'Recall']

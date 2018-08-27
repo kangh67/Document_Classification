@@ -483,7 +483,7 @@ def calculate_embedding_matrix(EMB_DIM, word_index):
     embedding_matrix -- shape:((len(word_index) + 1, EMB_DIM), embedding matrix for building embedding layer
     """
     embeddings_index = {}
-    f = open(os.path.join('./data/glove.6B.' + str(EMB_DIM) + 'd.txt'))
+    f = open(os.path.join('./data/glove.42B.' + str(EMB_DIM) + 'd.txt'))
     for line in f:
         values = line.split()
         word = values[0]
