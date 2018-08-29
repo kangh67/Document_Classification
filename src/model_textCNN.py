@@ -1,6 +1,6 @@
 import keras
 from keras.layers import Dense, Input, Flatten
-from keras.layers import Conv1D, MaxPooling1D, Merge, Dropout
+from keras.layers import Conv1D, MaxPooling1D, Dropout
 from keras.models import Model
 
 
