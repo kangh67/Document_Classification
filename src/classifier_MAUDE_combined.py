@@ -381,23 +381,6 @@ elif mode == 'baseline':
     df_classic.to_csv('models/metrics/classic_models.csv')
 
 
-    """
-    plt.figure()
-    plt.figure(figsize=(10, 10))
-    plt.plot(fpr_lr, tpr_lr, color='blue', lw=2, linestyle='-', label='LR AUC = %0.4f' % auc_lr)
-    plt.plot(fpr_svm, tpr_svm, color='red', lw=2, linestyle=':', label='SVM AUC = %0.4f' % auc_svm)
-    plt.plot(fpr_nb, tpr_nb, color='purple', lw=2, linestyle='-.', label='NB AUC = %0.4f' % auc_nb)
-    plt.plot(fpr_rf, tpr_rf, color='green', lw=2, linestyle='--', label='RF AUC = %0.4f' % auc_rf)
-    plt.plot([0, 1], [0, 1], color='gray', lw=1, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('FP rate')
-    plt.ylabel('TP rate')
-    plt.legend(loc='lower right')
-    plt.show()
-    """
-
-
 # compare mode
 else:
     # get model list
