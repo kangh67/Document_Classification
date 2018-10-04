@@ -97,6 +97,11 @@ print('Exclusion keywords - generic names:', len(exclusion_generic))
 print('Inclusion keywords - manufacturer names:', len(inclusion_manu))
 
 
+# Count generic and manu hit of filtered data
+dev_filtered_generic = dict()
+dev_filtered_manu = dict()
+
+
 # Function of filter application
 def apply_filter(line):
     brand = line.split('|')[6].lower()
@@ -119,10 +124,20 @@ def apply_filter(line):
         if re.search(r'\b' + keyword + r'\b', brand) or re.search(r'\b' + keyword + r'\b', generic):
             inclusion_generic[keyword] += 1
             flag_in_ge = True
+            # Count generic name hit
+            if generic in dev_filtered_generic.keys():
+                dev_filtered_generic[generic] += 1
+            else:
+                dev_filtered_generic[generic] = 1
     for keyword in inclusion_manu.keys():
         if re.search(r'\b' + keyword + r'\b', manu):
             inclusion_manu[keyword] += 1
             flag_in_manu = True
+            # Count manu name hit
+            if manu in dev_filtered_manu.keys():
+                dev_filtered_manu[manu] += 1
+            else:
+                dev_filtered_manu[manu] = 1
 
     return flag_in_ge or flag_in_manu
 
@@ -177,6 +192,14 @@ print('Hit ranking of generic exclusion keywords:', exclusion_generic_sorted)
 inclusion_manu_sorted = sorted(inclusion_manu.items(), reverse=True, key=lambda kv: kv[1])
 print('Hit # of manufacturer inclusion keywords', in_manu_count)
 print('Hit ranking of manufacturer keywords:', inclusion_manu_sorted)
+
+dev_filtered_generic_sorted = sorted(dev_filtered_generic.items(), reverse=True, key=lambda kv: kv[1])
+print('Unique Generic name # of filtered data:', len(dev_filtered_generic))
+print('Generic name ranking of filtered data:', dev_filtered_generic_sorted)
+
+dev_filtered_manu_sorted = sorted(dev_filtered_manu.items(), reverse=True, key=lambda kv: kv[1])
+print('Unique Manufacturer name # of filtered data:', len(dev_filtered_manu))
+print('Manufacturer name ranking of filtered data:', dev_filtered_manu_sorted)
 
 
 # Apply filtered MDR on text data
