@@ -317,6 +317,8 @@ def tokenazation_combined_models(word_index, documents_sent, MAX_NUM_WORDS, MAX_
                 wordTokens = text_to_word_sequence(sent)
                 k = 0
                 for _, word in enumerate(wordTokens):
+                    if word not in word_index.keys():
+                        continue
                     if k < MAX_SENT_LENGTH and word_index[word] < MAX_NUM_WORDS:
                         data[i, j, k] = word_index[word]
                         k = k + 1
