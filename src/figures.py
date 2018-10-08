@@ -8,7 +8,7 @@ from sklearn.metrics import auc
 # 1 = ROC of individual models
 # 2 = ROC of hybrid models
 # 3 = acc vs. f1 of all hybrid and individual models
-mode = 2
+mode = 3
 
 
 if mode == 1 or mode == 2:
