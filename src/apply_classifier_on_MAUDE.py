@@ -13,10 +13,13 @@ MAX_SENT_LENGTH = 100
 
 
 # MAUDE 2017 tsv file for classifier
-maude_2017 = 'data/MAUDE_2017_noLabel.tsv'
+maude_2017 = 'data/MAUDE_2017_text_ed.txt'
 
 # Training data, 70% of 2008-2016 MAUDE data, used by baseline models
 train_file = './data/MAUDE_train.tsv'
+
+# (OUTPUT) form with label
+maude_2017_labeled = 'data/MAUDE_2017_text_ed_labeled.xlsx'
 
 
 # === read file ===
@@ -118,7 +121,8 @@ print('- Model - 0 - 1 -')
 print('CNN:', pred_CNN.round().sum(axis=0))
 print('H_RNN:', pred_H_RNN.round().sum(axis=0))
 print('LR:', pred_lr.round().sum(axis=0))
-print('Hybrid:', ((pred_CNN + pred_H_RNN + pred_lr) / 3).round().sum(axis=0))
+print('Hybrid_CNN+H_RNN:', ((pred_CNN + pred_H_RNN) / 2).round().sum(axis=0))
+print('Hybrid_3:', ((pred_CNN + pred_H_RNN + pred_lr) / 3).round().sum(axis=0))
 
 overlap_CH = 0
 overlap_CL = 0
@@ -139,3 +143,17 @@ print('Overlap CNN & H_RNN:', overlap_CH, '/', len(pred_CNN))
 print('Overlap CNN & LR:', overlap_CL, '/', len(pred_CNN))
 print('Overlap LR & H_RNN:', overlap_HL, '/', len(pred_CNN))
 print('Overlap all:', overlap_all, '/', len(pred_CNN))
+
+
+# Output
+data['CNN'] = pred_CNN.round().T[1]
+data['H_RNN'] = pred_H_RNN.round().T[1]
+data['LR'] = pred_lr.round().T[1]
+data['HYBRID_CNN+H_RNN'] = ((pred_CNN + pred_H_RNN) / 2).round().T[1]
+data['HYBRID_3'] = ((pred_CNN + pred_H_RNN + pred_lr) / 3).round().T[1]
+
+writer = pd.ExcelWriter(maude_2017_labeled)
+data.to_excel(writer, encoding='utf-8')
+writer.save()
+print('=== Output ===')
+print('Labeled data was written to', maude_2017_labeled)
