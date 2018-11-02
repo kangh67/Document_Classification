@@ -16,14 +16,15 @@ maude_2017 = 'data/MAUDE_2017_noLabel.tsv'
 # (OUTPUT) MAUDE 2017 text vector file
 maude_2017_vector = 'data/MAUDE_2017_vectors.txt'
 
+# (OUTPUT) MAUDE 2017 with Euclidean distance
+maude_2017_ed = 'data/MAUDE_2017_text_ed.txt'
+
 # 1 = calculate vectors; 2 = sampling
-mode = 1
+mode = 2
 
 # Reset cutoff of the USE session, only works when mode = 1
 reset_cutoff = 30
 
-# Euclidean distance cutoff, only works when mode = 2
-ed_cutoff = 0.5
 
 # === Calculate vectors for filtered texts by using Universal Sentence Encoder
 if mode == 1:
@@ -107,44 +108,6 @@ if mode == 1:
 
 # === Sampling according to Euclidean distance
 elif mode == 2:
-    print('=== Group reports by generic names ===')
-    generic_mdrSet = dict()
-    with open(dev17_filtered, 'r') as r:
-        line = r.readline()
-        while True:
-            line = r.readline()
-            if not line:
-                break
-            else:
-                line = line.split('|')
-                if line[7] in generic_mdrSet.keys():
-                    generic_mdrSet[line[7]].add(line[0])
-                else:
-                    newSet = set()
-                    newSet.add(line[0])
-                    generic_mdrSet[line[7]] = newSet
-    sum_report = 0
-    for mdr in generic_mdrSet.keys():
-        sum_report += len(generic_mdrSet[mdr])
-    print('Unique generic names:', len(generic_mdrSet))
-    print('Unique MDRs:', sum_report)
-
-    # Read MDR_TEXT file
-    mdr_text = dict()
-    with open(maude_2017, 'r') as r:
-        line = r.readline()
-        while True:
-            line = r.readline()
-            if not line:
-                break
-            else:
-                line = line.split('\t')
-                mdr_text[line[0]] = line[1]
-    print(len(mdr_text), 'MDR have text')
-
-    print('=== Sampling by Euclidean distance ===')
-    print('Distance cutoff:', ed_cutoff)
-
     # Read mdr_vector file
     def interpret_one_line(line):
         line = line.replace('\n', '').split('\t')
@@ -153,8 +116,9 @@ elif mode == 2:
         if len(vector) != 512:
             print('The vector dimension of this report is', len(vector), 'less than 512:', mdr)
         vector = [float(x) for x in vector]
-        MDR_vector[mdr] = vector
+        MDR_vector[mdr] = np.asarray(vector)
 
+    print('=== Read report vectors ===')
     MDR_vector = dict()
     with open(maude_2017_vector, 'r') as r:
         line = r.readline()
@@ -166,18 +130,62 @@ elif mode == 2:
                 interpret_one_line(line)
     print('Found', len(MDR_vector), 'vectors from', maude_2017_vector)
 
+    print('=== Group reports by generic names ===')
+    mdrs = set()
+    generic_mdrSet = dict()
+    with open(dev17_filtered, 'r') as r:
+        line = r.readline()
+        while True:
+            line = r.readline()
+            if not line:
+                break
+            else:
+                line = line.split('|')
+                # Do not consider the mdrs who do not have text vectors
+                if line[0] not in MDR_vector.keys() or line[0] in mdrs:
+                    continue
+                mdrs.add(line[0])
+                if line[7] in generic_mdrSet.keys():
+                    generic_mdrSet[line[7]].add(line[0])
+                else:
+                    newSet = set()
+                    newSet.add(line[0])
+                    generic_mdrSet[line[7]] = newSet
+    sum_report = 0
+    for gen in generic_mdrSet.keys():
+        sum_report += len(generic_mdrSet[gen])
+    print('Unique generic names:', len(generic_mdrSet))
+    print('Unique MDRs with text vectors:', sum_report)
+
+    # Read MDR_TEXT file
+    mdr_text = dict()
+    with open(maude_2017, 'r') as r:
+        line = r.readline()
+        while True:
+            line = r.readline()
+            if not line:
+                break
+            else:
+                line = line.split('\t')
+                mdr_text[line[0]] = line[1].replace('\n', '')
+    print(len(mdr_text), 'MDR have text')
+
+    print('=== Calculating Euclidean distances ===')
+
     # Sample by generic names
+    ed = open(maude_2017_ed, 'w')
+    ed.write('MDR\tGENERIC_NAME\tTEXT\tEUCLIDEAN_DISTANCE\n')
     count_ge = 0
     for ge in generic_mdrSet.keys():
         count_ge += 1
-        print(count_ge, '-', ge)
+        print(count_ge, '-', ge, ':', len(generic_mdrSet[ge]))
         # Sampled MDR
         inclu_mdr = set()
         # Randomly pick the first mdr
         mdr_root = generic_mdrSet[ge].pop()
         current_vec = MDR_vector[mdr_root]
         inclu_mdr.add(mdr_root)
-        print('...', mdr_root, 'added to', ge, '... root')
+        ed.write(mdr_root + '\t' + ge + '\t' + mdr_text[mdr_root] + '\t1.0\n')
         while len(generic_mdrSet[ge]) > 0:
             mdr_distance = dict()
             # The furthest distance by now
@@ -191,11 +199,10 @@ elif mode == 2:
                 if dis >= furthest_dis:
                     furthest_dis = dis
                     furthest_mdr = m
-            if furthest_dis >= ed_cutoff:
-                current_vec = (current_vec * len(inclu_mdr) + MDR_vector[furthest_mdr]) / (len(inclu_mdr) + 1)
-                inclu_mdr.add(m)
-                print('...', m, 'added to', ge, '... Distance to root =', furthest_dis)
-                generic_mdrSet[ge].remove(m)
-            else:
-                print('...', len(inclu_mdr), 'reports were included in', ge, 'with distance cutoff', ed_cutoff)
-                break
+
+            current_vec = (current_vec * len(inclu_mdr) + MDR_vector[furthest_mdr]) / (len(inclu_mdr) + 1)
+            inclu_mdr.add(furthest_mdr)
+            ed.write(furthest_mdr + '\t' + ge + '\t' + mdr_text[furthest_mdr] + '\t' + str(furthest_dis) + '\n')
+            generic_mdrSet[ge].remove(furthest_mdr)
+
+    ed.close()
