@@ -2,9 +2,9 @@
 import re
 
 # MAUDE 2017 original data
-dev17 = 'data/foidev2017.txt'
-text17 = 'data/foitext2017.txt'
-mdr17 = 'data/mdrfoiThru2017.txt'
+dev17 = 'MAUDE_data/foidev2017.txt'
+text17 = 'MAUDE_data/foitext2017.txt'
+mdr17 = 'MAUDE_data/mdrfoiThru2017.txt'
 
 
 # Inclusion and exclusion keywords
