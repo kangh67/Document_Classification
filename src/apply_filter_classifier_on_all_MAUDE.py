@@ -393,7 +393,7 @@ print(summary)
 
 
 # After 1997
-for i in range(1998, 2018):
+for i in range(1998, 2019):
     print('===', i, '===')
     filtered_data, summary = interpret_dev(str(i))  # apply filter
     filtered_data = interpret_text(filtered_data, str(i))  # add text to filtered_data
