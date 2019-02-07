@@ -141,9 +141,11 @@ elif mode == 3:
                 color='blue', marker='v', label='Deep Learning Models')
     plt.scatter(df_hybrid['Accuracy'], df_hybrid['F1 score'], alpha=0.5,
                 color='purple', marker='o', label='Hybrid Models')
-    plt.xlabel('Accuracy')
-    plt.ylabel('F1 Measure')
-    plt.legend(loc='lower right', handlelength=2, borderpad=1, labelspacing=1.2)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlabel('Accuracy', fontsize=20)
+    plt.ylabel('F1 Measure', fontsize=20)
+    plt.legend(loc='lower right', handlelength=2, borderpad=1, labelspacing=1.2, fontsize=16)
     plt.show()
 
 else:
