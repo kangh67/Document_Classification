@@ -8,7 +8,7 @@ from sklearn.metrics import auc
 # 1 = ROC of individual models
 # 2 = ROC of hybrid models
 # 3 = acc vs. f1 of all hybrid and individual models
-mode = 3
+mode = 2
 
 
 if mode == 1 or mode == 2:
@@ -101,9 +101,12 @@ if mode == 1:
     plt.plot([0, 1], [0, 1], color='gray', lw=1, linestyle=ls['dotted'])
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('FP rate')
-    plt.ylabel('TP rate')
-    plt.legend(title='AUC Ranking', loc='lower right', handlelength=10, borderpad=1, labelspacing=1.2)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlabel('FP Rate', fontsize=20)
+    plt.ylabel('TP Rate', fontsize=20)
+    legend = plt.legend(loc='lower right', handlelength=10, borderpad=1, labelspacing=1.2, fontsize=12)
+    legend.set_title('AUC Ranking (individual models)', prop={'size': 14})
     plt.show()
 
 elif mode == 2:
@@ -124,9 +127,12 @@ elif mode == 2:
     plt.plot([0, 1], [0, 1], color='gray', lw=1, linestyle=ls['dotted'])
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('FP rate')
-    plt.ylabel('TP rate')
-    plt.legend(title='AUC Ranking', loc='lower right', handlelength=10, borderpad=1, labelspacing=1.2)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlabel('FP Rate', fontsize=20)
+    plt.ylabel('TP Rate', fontsize=20)
+    legend = plt.legend(loc='lower right', handlelength=10, borderpad=1, labelspacing=1.4, fontsize=12)
+    legend.set_title('AUC Ranking (hybrid models)', prop={'size': 14})
     plt.show()
 
 elif mode == 3:
