@@ -151,12 +151,12 @@ recall_metrics = f1_precision_recall()
 
 
 # saves the model and weights after each epoch if the validation loss decreased
-checkpointer = ModelCheckpoint(filepath='./models/model.{epoch:02d}-{val_loss:.2f}-{val_acc:.3f}.hdf5',
+checkpointer = ModelCheckpoint(filepath='./models/weights.{epoch:02d}-{val_loss:.2f}-{val_acc:.3f}.hdf5',
                                monitor='val_acc',
                                mode='max',
                                verbose=1,
                                save_best_only=True,
-                               save_weights_only=False)
+                               save_weights_only=True)
 
 
 # Training

@@ -12,19 +12,21 @@ MAX_SENTS = 20
 MAX_SENT_LENGTH = 100
 
 
-# MAUDE 2017 tsv file for classifier
-maude_2017 = 'data/MAUDE_2017_text_ed.txt'
+# MAUDE 2019 tsv file for classifier
+# maude_2019 = 'data/MAUDE_2017_text_ed.txt'
+maude_2019 = 'data/MAUDE_2019_noLabel.tsv'
 
 # Training data, 70% of 2008-2016 MAUDE data, used by baseline models
 train_file = './data/MAUDE_train.tsv'
 
 # (OUTPUT) form with label
-maude_2017_labeled = 'data/MAUDE_2017_text_ed_labeled.xlsx'
+# maude_2017_labeled = 'data/MAUDE_2017_text_ed_labeled.xlsx'
+maude_2019_labeled = 'data/MAUDE_2019_labeled.xlsx'
 
 
 # === read file ===
-print("Reading prediction data from", maude_2017)
-data = pd.read_csv(maude_2017, sep='\t')
+print("Reading prediction data from", maude_2019)
+data = pd.read_csv(maude_2019, sep='\t')
 print("prediction data shape: " + str(data.shape))
 
 documents_sent = []
@@ -152,8 +154,8 @@ data['LR'] = pred_lr.round().T[1]
 data['HYBRID_CNN+H_RNN'] = ((pred_CNN + pred_H_RNN) / 2).round().T[1]
 data['HYBRID_3'] = ((pred_CNN + pred_H_RNN + pred_lr) / 3).round().T[1]
 
-writer = pd.ExcelWriter(maude_2017_labeled)
+writer = pd.ExcelWriter(maude_2019_labeled)
 data.to_excel(writer, encoding='utf-8')
 writer.save()
 print('=== Output ===')
-print('Labeled data was written to', maude_2017_labeled)
+print('Labeled data was written to', maude_2019_labeled)
