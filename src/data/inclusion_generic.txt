@@ -1,0 +1,94 @@
+ADC
+Administrative billing system
+Alert
+Alert fatigue
+Anesthesia monitor
+Apnea monitor
+Arterial monitor
+Atlas monitor
+Automated
+Automated dispensing cabinet
+Barcoding
+Bar-coding
+Blood pressure monitor
+Central monitor
+Clinical documentation system
+Communication device
+Communication system
+Computer
+Computerized physician order entry
+Console monitor
+CPOE
+Data
+Data backup
+Data display
+Data retrieval
+Database
+Decision support
+Digital
+Dispensing system
+Display
+Dose suggestion
+Downloader
+Dropdown
+Drug screen
+Drug suggestion
+EDIS
+EHR
+Electronic document information
+Electronic health record
+Electronic medical record
+Electronic medication administration records
+Electronic patient
+eMARs
+EMR
+Fetal monitor
+Graphic
+Health IT
+HIT
+ICT
+Imaging system
+Information and communication
+Information system
+Information technology
+Interface device
+Internet
+Interoperable
+Invision
+Keyboard
+Laboratory information system
+LIS
+Management system
+Medical communication system
+Medication list
+Monitoring system
+Mouse
+Network
+Order entry
+PACS
+Paste
+Patient monitor
+Physiological monitor
+Picture archiving
+Portal
+Powerchart
+Practice management
+Pressure monitor
+Printer
+Program
+PT monitor
+Safety monitor
+Server
+Soarian
+Software
+Speech recognition system
+Telemetry
+Telemetry monitor
+Telemetry transmitter
+Touchscreen
+Trima Accel Platelet
+Truncate
+Vital sign monitor
+Web
+Wireless
+Workstation

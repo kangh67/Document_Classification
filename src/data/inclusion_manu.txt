@@ -1,0 +1,38 @@
+Allscripts
+Aprima
+AthenaClinicals
+Athenahealth
+Centricity
+Cerner
+CureMD
+DocApp
+DocPatient Network
+Doctations
+eClinicalWorks
+Epic
+EpicCare
+GE Healthcare
+Greenway
+Hass
+Healthtronics
+Henry Schein
+Homer
+Horizon Ambulatory
+Intergy
+iPatientCare
+Isite
+iSOFT
+Kestral
+McKesson
+Medical Director
+Medisoft Clinical
+Meditech
+MedPro
+Medsphere
+MyChart
+NextGen
+Oasis
+OpenVista
+Practice fusion
+Prime Suite
+Sage
