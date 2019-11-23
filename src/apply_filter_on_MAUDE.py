@@ -1,26 +1,23 @@
 # Apply classfiers on MAUDE 2017
 import re
 
-# MAUDE 2017 original data
-dev17 = 'MAUDE_data/foidev2017.txt'
-text17 = 'MAUDE_data/foitext2017.txt'
-mdr17 = 'MAUDE_data/mdrfoiThru2017.txt'
 
+# MAUDE 2019 original data
+dev19 = 'MAUDE_data/foidev2019.txt'
+text19 = 'MAUDE_data/foitext2019.txt'
+mdr19 = 'MAUDE_data/mdrfoi2019.txt'
 
 # Inclusion and exclusion keywords
 in_gen = 'data/inclusion_generic.txt'
 ex_gen = 'data/exclusion_generic.txt'
 in_manu = 'data/inclusion_manu.txt'
 
+# MAUDE 2019 filtered data
+dev19_filtered = 'data/dev_2019_filtered.txt'
+text19_filtered = 'data/text_2019_filtered.txt'
 
-# MAUDE 2017 filtered data
-dev17_filtered = 'data/dev_2017_filtered.txt'
-text17_filtered = 'data/text_2017_filtered.txt'
-
-
-# MAUDE 2017 tsv file for classifier
-maude_2017 = 'data/MAUDE_2017_noLabel.tsv'
-
+# MAUDE 2019 tsv file for classifier
+maude_2019 = 'data/MAUDE_2019_noLabel.tsv'
 
 # Initialization
 dev = dict()
@@ -30,8 +27,8 @@ dev_generic = dict()
 dev_manu = dict()
 
 
-# Summary of MAUDE 2017
-with open(dev17, 'rb') as d:
+# Summary of MAUDE 2019
+with open(dev19, 'rb') as d:
     line = d.readline()
     # print(line.decode('utf-8').split('|')[7])
     while True:
@@ -142,20 +139,20 @@ def apply_filter(line):
     return flag_in_ge or flag_in_manu
 
 
-# Apply filter to dev 2017
-print('=== Apply the filter on MAUDE 2017 data ===')
+# Apply filter to dev 2019
+print('=== Apply the filter on MAUDE 2019 data ===')
 dev_filtered_count = 0
 dev_filtered_mdr = set()
-with open(dev17, 'rb') as d:
+with open(dev19, 'rb') as d:
     line = d.readline()
-    w = open(dev17_filtered, 'w')
-    w.write(line.decode('utf8', 'ignore'))
+    w = open(dev19_filtered, 'w')
+    w.write(line.decode('utf8', 'ignore').replace("\n", ""))
     while True:
         line = d.readline()
         if not line:
             break
         else:
-            line = line.decode('utf8', 'ignore')
+            line = line.decode('utf8', 'ignore').replace("\n", "")
             if apply_filter(line):
                 dev_filtered_count += 1
                 w.write(line)
@@ -205,16 +202,16 @@ print('Manufacturer name ranking of filtered data:', dev_filtered_manu_sorted)
 # Apply filtered MDR on text data
 text_filtered_count = 0
 text_filtered_mdr = set()
-with open(text17, 'rb') as d:
-    line = d.readline().decode('utf8', 'ignore')
-    w = open(text17_filtered, 'w')
+with open(text19, 'rb') as d:
+    line = d.readline().decode('utf8', 'ignore').replace("\n", "")
+    w = open(text19_filtered, 'w')
     w.write(line)
     while True:
         line = d.readline()
         if not line:
             break
         else:
-            line = line.decode('utf8', 'ignore')
+            line = line.decode('utf8', 'ignore').replace("\n", "")
             if line.split('|')[0] in dev_filtered_mdr:
                 text_filtered_count += 1
                 text_filtered_mdr.add(line.split('|')[0])
@@ -222,28 +219,31 @@ with open(text17, 'rb') as d:
     w.close()
 
 print('Text record # after applying the filter:', text_filtered_count, '(', len(text_filtered_mdr), 'unique)')
-print('Filtered dev file was saved at:', dev17_filtered)
-print('Filtered text file was saved at:', text17_filtered)
+print('Filtered dev file was saved at:', dev19_filtered)
+print('Filtered text file was saved at:', text19_filtered)
 
 
 # Create tsv file
-text_2017 = dict()
-with open(text17_filtered, 'r') as d:
+text_2019 = dict()
+with open(text19_filtered, 'r') as d:
     line = d.readline()
     while True:
         line = d.readline()
         if not line:
             break
+        elif len(line) < 1:
+            continue
         else:
             line = line.split('|')
-            if line[0] in text_2017.keys():
-                text_2017[line[0]] += ' >< ' + line[5].replace('\n', '')
+            if line[0] in text_2019.keys():
+                text_2019[line[0]] += ' >< ' + line[5].replace('\n', '')
             else:
-                text_2017[line[0]] = line[5].replace('\n', '')
+                # print(line)
+                text_2019[line[0]] = line[5].replace('\n', '')
 
 print('=== Create .tsv file ===')
-with open(maude_2017, 'w') as w:
+with open(maude_2019, 'w') as w:
     w.write('MDR\tTEXT\n')
-    for key in text_2017.keys():
-        w.write(key + '\t' + text_2017[key] + '\n')
-print('Saved at', maude_2017)
+    for key in text_2019.keys():
+        w.write(key + '\t' + text_2019[key] + '\n')
+print('Saved at', maude_2019)
