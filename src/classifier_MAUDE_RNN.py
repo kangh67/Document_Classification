@@ -7,7 +7,7 @@ from keras.callbacks import Callback, ModelCheckpoint
 
 
 # === Hyper parameters ===
-attention_switch = False    # with or without attention
+attention_switch = True  # with or without attention
 
 EMB_DIM = 300
 trainable = True
